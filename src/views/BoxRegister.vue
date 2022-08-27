@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import modalPay from '../components/modalPay.vue'
 
 const productInput = ref('');
@@ -37,6 +37,10 @@ async function getProduct(){
     productInput.value = '';
 }
 
+onMounted(() => {
+  txtCode.value.focus();
+  
+})
 
 const changeQuantity = (id, event, priceSale) => {
     listProducts.value.forEach(element => {
@@ -60,7 +64,6 @@ const total = computed(() => {
   return listProducts.value.map(item => item.total).reduce((prev, curr) => prev + curr, 0)
 });
 
-
 const changeIndexProdyct = (index) => {
     indexTbl.value = index;
 }
@@ -82,14 +85,44 @@ const pay = () => {
         alert('No hay productos para facturar');
     }
 }
+
+const closeModal = (e) => {
+       modalPayView.value = e;
+       txtCode.value.focus();
+}
+
+const refresh = (e) => {
+    modalPayView.value  = false;
+    if(e){
+        listProducts.value = [];
+    }
+    txtCode.value.focus();
+}
+
+const upQt = (index) => {
+    const newQt = listProducts.value[index].quantity += 1
+    listProducts.value[index].quantity = newQt;
+    listProducts.value[index].total = newQt * Number(listProducts.value[index].price_sale);
+    txtCode.value.focus();
+}
+
+const downQt = (index) => {
+    if(listProducts.value[index].quantity > 1){
+        const newQt = listProducts.value[index].quantity -= 1
+        listProducts.value[index].quantity = newQt;
+        listProducts.value[index].total = newQt * Number(listProducts.value[index].price_sale);
+    }
+    txtCode.value.focus();
+}
+
 </script>
 <template >
-<div @click.ctrl="deleteProduct">
+<div>
     <div>
-        <div class="grid grid-cols-6 mt-2 ml-2">
+        <div class="grid grid-cols-6 mt-2 ml-2 items-center">
             <p>Codigo de Producto:</p>
             <input type="text" 
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             v-model="productInput"
             @keyup.enter="getProduct"
             @keyup.ctrl.space="pay"
@@ -97,31 +130,49 @@ const pay = () => {
             >
         </div>
     </div>
-    <div class="grid grid-cols-3 mt-2">
-        
-        <table class="col-span-2">
-            <thead>
+    <div class="grid grid-cols-4 mt-2">
+        <table class="col-span-3 table-auto w-full ml-3 h-4">
+            <thead class="text-xs font-semibold uppercase text-gray-400 bg-gray-50">
                 <tr>
+                    <th>Acciones</th>
                     <th>Producto</th>
                     <th>Cantidad</th>
-                    <th>Precio Und.</th>
+                    <th>Precio uni.</th>
                     <th>Total</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr v-for="(item, index) in listProducts" :key="index" @click="changeIndexProdyct(index)" :class="[indexTbl === index ? 'bg-sky-500' : '']" class="hover:bg-sky-500 cursor-pointer'">
-                    <td>{{ item.name }}</td>
-                    <td><input type="number" v-model="item.quantity" @change="changeQuantity(item.id, $event, item.price_sale)" min="1" class="bg-inherit text-center "></td>
-                    <td><input type="number" v-model="item.price_sale" @change="changePriceSale(item.id, $event)" min="1" class="bg-inherit text-center "></td>
-                    <td>{{ item.total }}</td>
+            <tbody class="text-sm divide-y divide-gray-100 ">
+                <tr v-for="(item, index) in listProducts" :key="index" @click="changeIndexProdyct(index)" @click.ctrl="deleteProduct" class="cursor-pointer hover:bg-gray-100" :class="[indexTbl === index ? 'bg-gray-100' : '']">
+                    <td>
+                        <font-awesome-icon icon="fa-solid fa-angle-down" class="text-red-300 text-3xl ml-1" @click="downQt(index)"/>
+                        <font-awesome-icon icon="fa-solid fa-angle-up" class="text-green-300 text-3xl ml-4" @click="upQt(index)"/>
+                        <font-awesome-icon icon="fa-solid fa-trash-can" class="text-red-300 text-xl ml-6 mb-1" @click="deleteProduct"/>
+                    </td>
+                    <td >{{ item.name }}</td>
+                    <td class="text-center">
+                        <input type="number" v-model="item.quantity" @change="changeQuantity(item.id, $event, item.price_sale)" min="1" class="w-6">
+                    </td>
+                    <td class="text-center">
+                        <input type="number" v-model="item.price_sale" @change="changePriceSale(item.id, $event)" min="1" class="w-14">
+                    </td>
+                    <td class="text-center">
+                        <p>{{ new Intl.NumberFormat().format(item.total) }}</p>
+                    </td>
                 </tr>
             </tbody>
         </table>
-        <div class="justify-items-center grid grid-cols-2">
-            <p class="col-span-2">Total Neto</p>
-            <p class="col-span-2">{{total}}</p>
+        <div class="justify-items-center grid grid-cols-2 col-span-1">
+            <p class="col-span-2 text-3xl">Total</p>
+            <p class="col-span-2 font-bold text-4xl">{{new Intl.NumberFormat().format(total)}}</p>
         </div>
     </div>
-    <modalPay v-if="modalPayView"></modalPay>
+    <modalPay 
+        v-if="modalPayView" 
+        @closeModal = "closeModal($event)"
+        @refresh = "refresh($event)"
+        :listProducts = listProducts
+        :total = total
+    >
+    </modalPay>
 </div>
 </template>
