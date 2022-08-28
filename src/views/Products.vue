@@ -58,7 +58,7 @@ const closeModal = (e) => {
     <div>
         <nav class="grid grid-cols-3 mt-4 mx-4" >
             <input type="text" v-model="search" @keyup.enter="getProductsByNameOrCode" ref="txtSearch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-            <button @click="openModalProduct" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-28 ml-4">Nuevo</button>
+            <button @click="openModalProduct" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-28 ml-4" title="Agregar un nuevo producto">Nuevo</button>
         </nav>
         <div class="m-4">
             <table class="col-span-3 table-auto w-full ml-3 h-4">
@@ -78,7 +78,7 @@ const closeModal = (e) => {
                 <tbody class="text-sm divide-y divide-gray-100">
                     <tr  v-for="(item, index) in products" :key="index" class="hover:bg-gray-100">
                         <td>
-                            <font-awesome-icon icon="fa-solid fa-pen-to-square" @click="openModalProduct(item)" class="text-2xl text-sky-500 cursor-pointer"/>
+                            <font-awesome-icon icon="fa-solid fa-pen-to-square" @click="openModalProduct(item)" class="text-2xl text-sky-500 cursor-pointer" title="Editar producto" />
                         </td>
                         <td class="text-center">{{item.code}}</td>
                         <td>{{item.name}}</td>

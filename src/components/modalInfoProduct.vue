@@ -121,6 +121,10 @@ const validate = () => {
     return res;
 }
 
+const toUpercase = (e) =>{
+    e.target.value = e.target.value.toUpperCase();
+}
+
 </script>
 <template>
 <div class="fixed inset-0" @keyup.esc="closeModal">
@@ -147,6 +151,7 @@ const validate = () => {
                             >
                             <p>Nombre:</p>
                             <input
+                            @input="toUpercase($event)"
                             placeholder="Ingrese nombre del producto"
                             type="text" 
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

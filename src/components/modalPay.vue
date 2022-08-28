@@ -23,7 +23,7 @@ onMounted(() => {
   txtPay.value.focus();
 })
 const generateSale = async () => {
-    if(bk.value > 0){
+    if(bk.value >= 0){
         const produsts = [];
         props.listProducts.forEach(element => {
             produsts.push({

@@ -7,6 +7,7 @@ const txtCode = ref(null)
 const listProducts = ref([]);
 const indexTbl = ref(0);
 const modalPayView = ref(false)
+const lstSale = ref([]);
 
 async function getProduct(){
     const getProductByCode = await fetch(`http://localhost:3000/boxdinner/productscode/${productInput.value}`, {
@@ -37,10 +38,21 @@ async function getProduct(){
     productInput.value = '';
 }
 
-onMounted(() => {
+onMounted(async () => {
   txtCode.value.focus();
-  
-})
+  await lastSale()
+});
+
+const lastSale = async () => {
+    lstSale.value = [];
+    const request = await fetch("http://localhost:3000/boxdinner/lastsale",{
+        method: 'GET'
+    });
+    const res = await request.json();
+    if(res.response){
+        lstSale.value = res.data;
+    }
+}
 
 const changeQuantity = (id, event, priceSale) => {
     listProducts.value.forEach(element => {
@@ -64,6 +76,7 @@ const total = computed(() => {
   return listProducts.value.map(item => item.total).reduce((prev, curr) => prev + curr, 0)
 });
 
+
 const changeIndexProdyct = (index) => {
     indexTbl.value = index;
 }
@@ -86,17 +99,17 @@ const pay = () => {
     }
 }
 
-const closeModal = (e) => {
-       modalPayView.value = e;
-       txtCode.value.focus();
+const closeModal =  (e) => {
+    modalPayView.value = e;
+    txtCode.value.focus();
 }
-
-const refresh = (e) => {
+const refresh = async (e) => {
     modalPayView.value  = false;
     if(e){
         listProducts.value = [];
     }
     txtCode.value.focus();
+    await lastSale()
 }
 
 const upQt = (index) => {
@@ -118,16 +131,33 @@ const downQt = (index) => {
 </script>
 <template >
 <div>
-    <div>
-        <div class="grid grid-cols-6 mt-2 ml-2 items-center">
+    <div class="grid grid-cols-2">
+        <div class="col-span-1 mt-2 ml-2 items-center">
             <p>Codigo de Producto:</p>
             <input type="text" 
-             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             v-model="productInput"
             @keyup.enter="getProduct"
             @keyup.ctrl.space="pay"
             ref="txtCode"
             >
+        </div>
+        <div class="col-span-1">
+            <h2 class="text-center">Ultima venta</h2>
+            <div class="grid grid-cols-3" v-for="item in lstSale">
+                <div class="text-center">
+                    <p>Pago</p>
+                    <strong>{{ new Intl.NumberFormat().format(item.payment)}}</strong>
+                </div>
+                <div  class="text-center">
+                    <p>Total</p>
+                    <strong>{{ new Intl.NumberFormat().format(item.total)}}</strong>
+                </div>
+                <div class="text-center">
+                    <p>Cambio</p>
+                    <strong>{{ new Intl.NumberFormat().format(item.payment - item.total)}}</strong>
+                </div>
+            </div>
         </div>
     </div>
     <div class="grid grid-cols-4 mt-2">
@@ -144,9 +174,9 @@ const downQt = (index) => {
             <tbody class="text-sm divide-y divide-gray-100 ">
                 <tr v-for="(item, index) in listProducts" :key="index" @click="changeIndexProdyct(index)" @click.ctrl="deleteProduct" class="cursor-pointer hover:bg-gray-100" :class="[indexTbl === index ? 'bg-gray-100' : '']">
                     <td>
-                        <font-awesome-icon icon="fa-solid fa-angle-down" class="text-red-300 text-3xl ml-1" @click="downQt(index)"/>
-                        <font-awesome-icon icon="fa-solid fa-angle-up" class="text-green-300 text-3xl ml-4" @click="upQt(index)"/>
-                        <font-awesome-icon icon="fa-solid fa-trash-can" class="text-red-300 text-xl ml-6 mb-1" @click="deleteProduct"/>
+                        <font-awesome-icon icon="fa-solid fa-angle-down" class="text-red-300 text-3xl ml-1" @click="downQt(index)" title="Disminuir cantidad"/>
+                        <font-awesome-icon icon="fa-solid fa-angle-up" class="text-green-300 text-3xl ml-4" @click="upQt(index)" title="Aumentar cantidad"/>
+                        <font-awesome-icon icon="fa-solid fa-trash-can" class="text-red-300 text-xl ml-6 mb-1" @click="deleteProduct" title="Eliminar Prodcuto"/>
                     </td>
                     <td >{{ item.name }}</td>
                     <td class="text-center">
