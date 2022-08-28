@@ -15,7 +15,8 @@ onMounted( async () =>{
 });
 
 const getSales = async () => {
-    
+    sales.value = [];
+    salesByCategory.value = [];
     if(initial.value === '' && finish.value === ''){
         const request = await fetch("http://localhost:3000/boxdinner/sales",{
             method: 'GET'
@@ -35,8 +36,6 @@ const getSales = async () => {
             salesByCategory.value = resSalesByCategory.data;
         }
     }else{
-        sales.value = [];
-        salesByCategory.value = [];
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -129,7 +128,7 @@ const cancelSale = async (id, active) => {
     }
 }
 
-const cancelProductSale = async(id, active, index) => {
+const cancelProductSale = async(id, active) => {
     const bolActive = active === 1 ? false : true; 
       const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -147,7 +146,6 @@ const cancelProductSale = async(id, active, index) => {
     const request = await fetch(`http://localhost:3000/boxdinner/productsonsales/${id}`, requestOptions);
     const res = await request.json();
     if(res.response){
-        await productsBySale(id,index)
         await getSales();
     }else{
         alert('Hubo un problema al cancelar la venta')

@@ -20,12 +20,12 @@ const product = ref({
 onMounted( async () =>{
     show.value = true;
     txtCode.value.focus();
-    product.value = {}
     const request = await fetch(`http://localhost:3000/boxdinner/categories`, {
         method: 'GET',
     });
     const res = await request.json();
     if(res.response){
+        product.value = {}
         categories.value = res.data;
         infoProduct();
         show.value = false;

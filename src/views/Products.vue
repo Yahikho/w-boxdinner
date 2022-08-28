@@ -37,6 +37,7 @@ const getProductsByNameOrCode =  async () => {
        msg.value = '';
        show.value = false;
     }else{
+        show.value = false;
         products.value = [];
         msg.value = `No se encotró nada con ese valor: ${search.value.toLocaleUpperCase()}`;
     }
