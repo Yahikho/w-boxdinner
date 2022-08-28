@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import modalPay from '../components/modalPay.vue'
 
+
 const productInput = ref('');
 const txtCode = ref(null)
 const listProducts = ref([]);

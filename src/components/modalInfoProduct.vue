@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import loading from '../components/loading.vue'
 const props = defineProps(['product']);
 const emit = defineEmits(['closeModal']);
 const categories = ref([]);
 const msg = ref('');
 const msgType = ref('failed');
 const txtCode = ref(null);
+const show = ref(false);
 const product = ref({
     code: "",
     name: "",
@@ -16,6 +18,7 @@ const product = ref({
 });
 
 onMounted( async () =>{
+    show.value = true;
     txtCode.value.focus();
     product.value = {}
     const request = await fetch(`http://localhost:3000/boxdinner/categories`, {
@@ -25,6 +28,7 @@ onMounted( async () =>{
     if(res.response){
         categories.value = res.data;
         infoProduct();
+        show.value = false;
     }else{
         console.log('Halgo salio mal')
     }
@@ -189,5 +193,6 @@ const toUpercase = (e) =>{
             </div>
         </div>
     </div>
+    <loading v-show="show"></loading>
 </div>
 </template>

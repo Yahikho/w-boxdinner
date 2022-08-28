@@ -1,17 +1,21 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import loading from '../components/loading.vue'
 const sales = ref([]);
 const salesByCategory = ref([]);
 const initial = ref('');
 const finish = ref('');
 const productBySales = ref([]);
 const indexSale =ref(0);
+const show = ref(false)
 
 onMounted( async () =>{
+    show.value = true;
     await getSales();
 });
 
 const getSales = async () => {
+    
     if(initial.value === '' && finish.value === ''){
         const request = await fetch("http://localhost:3000/boxdinner/sales",{
             method: 'GET'
@@ -74,7 +78,7 @@ const getSales = async () => {
             salesByCategory.value = data;
         }
     }
-    
+    show.value = false;
 }
 
 const formatDate = (date) => {
@@ -242,4 +246,5 @@ const cancelProductSale = async(id, active, index) => {
             </div>
         </div>
     </div>
+    <loading v-show="show"></loading>
 </template>

@@ -1,13 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import modalInfoProduct from '../components/modalInfoProduct.vue'
-
+import loading from '../components/loading.vue'
 const search = ref('');
 const products = ref([]);
 const msg = ref(null);
 const modalProduct = ref(false)
 const product = ref([]);
 const txtSearch = ref(null);
+const show = ref(false);
 
 onMounted(async () => {
     await getProductsByNameOrCode();
@@ -15,6 +16,7 @@ onMounted(async () => {
 });
 
 const getProductsByNameOrCode =  async () => {
+    show.value = true;
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
     const data = JSON.stringify({
@@ -33,6 +35,7 @@ const getProductsByNameOrCode =  async () => {
     if(res.response){
        products.value = res.data;
        msg.value = '';
+       show.value = false;
     }else{
         products.value = [];
         msg.value = `No se encotró nada con ese valor: ${search.value.toLocaleUpperCase()}`;
@@ -93,6 +96,7 @@ const closeModal = (e) => {
             </table>
             <p class="text-red-700 ml-4">{{msg}}</p>
         </div>
+        <loading v-show="show"></loading>
         <modalInfoProduct 
         v-if="modalProduct" 
         :product=product

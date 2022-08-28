@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import loading from '../components/loading.vue'
 const emit = defineEmits(['closeModal']);
 const props = defineProps(['category']);
 const txtname = ref(null);
 const msg = ref('');
 const msgType = ref('failed');
+const show = ref(false);
 const category = ref({
     iva: 0,
     name: '',
@@ -34,6 +36,7 @@ const infoCategory = async () => {
 const saveCategory = async () => {
     const valit = validate();
     if(valit){
+        show.value = true;
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
         msg.value = '';
@@ -50,6 +53,7 @@ const saveCategory = async () => {
             if(res.response){
                 msgType.value = 'success';
                 msg.value = `${res.message} // ${res.data.name}`;
+                show.value = false;
             }else{
                 msgType.value = 'failed';
                 msg.value = `Ocurrio algo inesperado`;
@@ -67,11 +71,13 @@ const saveCategory = async () => {
             if(res.response){
                 msgType.value = 'success';
                 msg.value = `${res.message} // ${res.data.name}`;
+                show.value = false;
             }else{
                 msgType.value = 'failed';
                 msg.value = `Algo salio mal`;
             }
         }
+        
     }
 }
 
@@ -138,5 +144,6 @@ let res = true;
             </div>
         </div>
     </div>
+    <loading v-show="show"></loading>
 </div>
 </template>

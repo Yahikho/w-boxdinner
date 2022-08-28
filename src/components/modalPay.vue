@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import loading from '../components/loading.vue'
 const emit = defineEmits(['closeModal', 'refresh']);
 const props = defineProps(['listProducts', 'total']);
 const txtPay = ref(null);
 const pay = ref(null);
 const msg = ref(null);
-
+const show = ref(false);
 
 const closeModal = () => {
     emit('closeModal', false)
@@ -24,6 +25,7 @@ onMounted(() => {
 })
 const generateSale = async () => {
     if(bk.value >= 0){
+        show.value = true;
         const produsts = [];
         props.listProducts.forEach(element => {
             produsts.push({
@@ -54,8 +56,8 @@ const generateSale = async () => {
             msg.value = "Venta registrada";
             if(confirm('¿Generar Factura?')){
                 console.log('Genera factura')
-                
             }
+            show.value = true;
             refresh();
         }else{
             msg.value = "Se jodio el sistema";
@@ -104,5 +106,6 @@ const generateSale = async () => {
             <p class="text-center" :class="[bk < 0 ? 'text-red-700': 'text-green-700']">{{msg}}</p>
         </div>
     </div>
+    <loading v-show="show"></loading>
 </div>
 </template>
